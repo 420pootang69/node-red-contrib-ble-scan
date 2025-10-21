@@ -7,6 +7,7 @@ module.exports = function (RED) {
         RED.nodes.createNode(this, config);
 
         let node = this;
+        node.filterString = config.filterString ? config.filterString.toLowerCase() : "";
         if (noble.state === 'poweredOn') {
             noble.startScanning([], true);
         } else {
@@ -24,6 +25,20 @@ module.exports = function (RED) {
         }
 
         let discover = function (peripheral) {
+            // Check if a filter string is set.
+            if (node.filterString.length > 0) {
+                
+                // Check if the peripheral has an address and if it matches.
+                if (!peripheral.address || !peripheral.address.toLowerCase().startsWith(node.filterString)) {
+                    // Address doesn't match the filter. Stop and send no message.
+                    return; 
+                }
+            }
+            
+            // If we are here, the device passed the filter
+            let msg = { payload: peripheral };
+            node.send(msg);
+        }
             let msg = { payload: peripheral };
             node.send(msg);
         }
