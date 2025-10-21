@@ -4,23 +4,59 @@
         color: '#a6bbcf',
         defaults: {
             name: { value: "" }
+            filterString: { value: "" }
         },
         inputs: 0,
         outputs: 1,
         icon: "arrow-in.png",
-        label: function () {
-            return this.name || "BLE Scan";
+        label: function() {
+            // If the user gave it a name, use that
+            if (this.name) {
+                return this.name;
+            }
+            // Otherwise, if they added a filter, show that
+            if (this.filterString) {
+                return "BLE Scan (" + this.filterString + "...)";
+            }
+            // Otherwise, use the default name
+            return "BLE Scan";
         }
     });
 </script>
 
-<script type="text/x-red" data-template-name="BLE Scan">
+<script type="text/html" data-template-name="BLE Scan">
     <div class="form-row">
-        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-filterString"><i class="fa fa-filter"></i> MAC Filter</label>
+        <input type="text" id="node-input-filterString" placeholder="e.g., a4:c1:38">
+    </div>
+    
+    <div class="form-tips">
+        <b>Tip:</b> If the MAC Filter is set, only peripherals whose
+        MAC address starts with this string will be output.
+        (e.g., <code>a4:c1:38</code>)
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="BLE Scan">
-    <p>Using noble.js continuously scans for BLE broadcasts and presents </p>
+<script type="text/html" data-help-name="BLE Scan">
+    <p>Scans for Bluetooth Low Energy (BLE) peripherals using noble.</p>
+    <p>This node will output a <code>msg</code> for each BLE device discovered.
+    The <code>msg.payload</code> will contain the full <code>peripheral</code>
+    object from the <code>noble</code> library.</p>
+    
+    <h3>Configuration</h3>
+    <dl class="message-properties">
+        <dt>MAC Filter
+            <span class="property-type">string</span>
+        </dt>
+        <dd>
+            If set, the node will only output messages for peripherals whose
+            MAC address (<code>peripheral.address</code>) starts with this string.
+            The comparison is case-insensitive.
+        </dd>
+    </dl>
 </script>
